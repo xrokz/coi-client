@@ -51,12 +51,12 @@ public class AbyssForm implements MythicalCreatureForm {
             if (i % 2 == 0) {
                 float mouthOpen = 0.03f + (float) Math.abs(Math.sin(time * 0.15f + i)) * 0.055f;
                 // Upper lip
-                drawBox(pose, consumer, bx - size * 0.55f, by + mouthOpen, bz + size - 0.01f, bx + size * 0.55f, by + mouthOpen + 0.03f, bz + size + 0.02f, 0.7f, 0.1f, 0.22f, 0.92f, light);
+                drawBox(pose, consumer, bx - size * 0.55f, by + mouthOpen, bz - size - 0.02f, bx + size * 0.55f, by + mouthOpen + 0.03f, bz - size + 0.01f, 0.7f, 0.1f, 0.22f, 0.92f, light);
                 // Lower lip
-                drawBox(pose, consumer, bx - size * 0.55f, by - mouthOpen - 0.03f, bz + size - 0.01f, bx + size * 0.55f, by - mouthOpen, bz + size + 0.02f, 0.7f, 0.1f, 0.22f, 0.92f, light);
+                drawBox(pose, consumer, bx - size * 0.55f, by - mouthOpen - 0.03f, bz - size - 0.02f, bx + size * 0.55f, by - mouthOpen, bz - size + 0.01f, 0.7f, 0.1f, 0.22f, 0.92f, light);
                 // Fangs
-                drawBox(pose, consumer, bx - 0.04f, by + mouthOpen - 0.01f, bz + size + 0.01f, bx - 0.02f, by + mouthOpen + 0.04f, bz + size + 0.025f, 0.92f, 0.92f, 0.9f, 0.92f, light);
-                drawBox(pose, consumer, bx + 0.02f, by + mouthOpen - 0.01f, bz + size + 0.01f, bx + 0.04f, by + mouthOpen + 0.04f, bz + size + 0.025f, 0.92f, 0.92f, 0.9f, 0.92f, light);
+                drawBox(pose, consumer, bx - 0.04f, by + mouthOpen - 0.01f, bz - size - 0.025f, bx - 0.02f, by + mouthOpen + 0.04f, bz - size - 0.01f, 0.92f, 0.92f, 0.9f, 0.92f, light);
+                drawBox(pose, consumer, bx + 0.02f, by + mouthOpen - 0.01f, bz - size - 0.025f, bx + 0.04f, by + mouthOpen + 0.04f, bz - size - 0.01f, 0.92f, 0.92f, 0.9f, 0.92f, light);
             }
         }
 

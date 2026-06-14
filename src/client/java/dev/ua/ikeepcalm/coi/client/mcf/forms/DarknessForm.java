@@ -46,11 +46,11 @@ public class DarknessForm implements MythicalCreatureForm {
 
             float midX = startX + sideSign * 0.58f;
             float midY = startY + 0.32f + legWave;
-            float midZ = startZ + (isLeft ? 0.07f : -0.07f);
+            float midZ = startZ + 0.07f;
 
             float endX = midX + sideSign * 0.32f;
             float endY = 0.02f;
-            float endZ = midZ + (isLeft ? 0.14f : -0.14f);
+            float endZ = midZ + 0.14f;
 
             drawLeg(pose, consumer, startX, startY, startZ, midX, midY, midZ, light);
             drawLeg(pose, consumer, midX, midY, midZ, endX, endY, endZ, light);
@@ -63,7 +63,7 @@ public class DarknessForm implements MythicalCreatureForm {
             if (i < 9) { // eyes on the massive head
                 ex = (rand.nextFloat() - 0.5f) * 0.55f;
                 ey = 2.0f + rand.nextFloat() * 0.5f + bodyBob;
-                ez = (rand.nextFloat() - 0.25f) * 0.45f;
+                ez = -0.24f - rand.nextFloat() * 0.04f;
             } else { // eyes covering the torso and arms
                 ex = (rand.nextFloat() - 0.5f) * 1.0f;
                 ey = 1.0f + rand.nextFloat() * 0.9f + bodyBob;
