@@ -66,6 +66,7 @@ public class CircleOfImaginationClient implements ClientModInitializer {
         });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             ClientBeyonderState.reset();
+            EffectManager.stopAll();
         });
     }
 
