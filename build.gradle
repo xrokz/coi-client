@@ -92,3 +92,24 @@ publishing {
         // retrieving dependencies.
     }
 }
+
+tasks.register("generateWhiteTexture") {
+    doLast {
+        def dir = file("src/client/resources/assets/coi-client/textures/entity")
+        dir.mkdirs()
+        def img = new java.awt.image.BufferedImage(1, 1, java.awt.image.BufferedImage.TYPE_INT_ARGB)
+        img.setRGB(0, 0, -1) // white
+        javax.imageio.ImageIO.write(img, "png", new File(dir, "white.png"))
+        println("Generated white.png successfully!")
+    }
+}
+
+tasks.named("compileClientJava").configure {
+    dependsOn("generateWhiteTexture")
+}
+
+
+
+
+
+

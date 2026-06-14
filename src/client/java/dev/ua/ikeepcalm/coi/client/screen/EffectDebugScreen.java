@@ -1,6 +1,7 @@
 package dev.ua.ikeepcalm.coi.client.screen;
 
 import dev.ua.ikeepcalm.coi.client.effects.EffectManager;
+import dev.ua.ikeepcalm.coi.client.mcf.MythicalFormManager;
 import dev.ua.ikeepcalm.coi.client.effects.VisualEffect;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -82,6 +83,40 @@ public class EffectDebugScreen extends Screen {
 
         y += 6;
 
+        int formY = y;
+        java.util.List<String> forms = MythicalFormManager.getRegisteredPathwayNames();
+        String currentForm = (minecraft != null && minecraft.player != null) ? MythicalFormManager.getForm(minecraft.player.getName().getString()) : null;
+        final int[] activeIndex = { -1 };
+        if (currentForm != null) {
+            for (int i = 0; i < forms.size(); i++) {
+                if (forms.get(i).equalsIgnoreCase(currentForm)) {
+                    activeIndex[0] = i;
+                    break;
+                }
+            }
+        }
+
+        String label = activeIndex[0] == -1 ? "Form: None (Click to cycle)" : "Form: " + forms.get(activeIndex[0]);
+        Button formCycleBtn = Button.builder(Component.literal(label), btn -> {
+            if (minecraft == null || minecraft.player == null || forms.isEmpty()) return;
+            String uuid = minecraft.player.getUUID().toString();
+            activeIndex[0] = (activeIndex[0] + 1) % forms.size();
+            String selected = forms.get(activeIndex[0]);
+            MythicalFormManager.handlePacket(uuid, selected + ":true:start");
+            btn.setMessage(Component.literal("Form: " + selected));
+        }).bounds(panelX, formY, PANEL_W / 2 - 2, 20).build();
+        addRenderableWidget(formCycleBtn);
+
+        addRenderableWidget(Button.builder(Component.literal("Clear Form").withStyle(ChatFormatting.YELLOW), btn -> {
+            if (minecraft != null && minecraft.player != null) {
+                MythicalFormManager.handlePacket(minecraft.player.getUUID().toString(), ":true:stop");
+                activeIndex[0] = -1;
+                formCycleBtn.setMessage(Component.literal("Form: None (Click to cycle)"));
+            }
+        }).bounds(panelX + PANEL_W / 2 + 2, formY, PANEL_W / 2 - 2, 20).build());
+
+        y += 26;
+
         // Stop All
         addRenderableWidget(Button.builder(Component.literal("Stop All Effects").withStyle(ChatFormatting.RED),
                 btn -> EffectManager.stopAll()).bounds(panelX, y, PANEL_W / 2 - 2, 20).build());
@@ -92,12 +127,12 @@ public class EffectDebugScreen extends Screen {
 
     @Override
     public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        super.extractRenderState(graphics, mouseX, mouseY, a);
-
         // Semi-transparent panel behind controls (no blur — world is still rendering)
         int panelX = (this.width - PANEL_W) / 2;
-        int panelH = 50 + EffectManager.getRegistry().size() * ROW_H + 34;
+        int panelH = 50 + EffectManager.getRegistry().size() * ROW_H + 34 + 26;
         graphics.fill(panelX - 8, 8, panelX + PANEL_W + 8, 8 + panelH, 0xCC000000);
+
+        super.extractRenderState(graphics, mouseX, mouseY, a);
 
         // Title
         graphics.centeredText(font, Component.literal("Visual Effects — Debug").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD),

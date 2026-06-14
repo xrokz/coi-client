@@ -5,6 +5,7 @@ import dev.ua.ikeepcalm.coi.client.config.AbilityConfig;
 import dev.ua.ikeepcalm.coi.client.config.AbilityInfo;
 import dev.ua.ikeepcalm.coi.client.config.HudConfig;
 import dev.ua.ikeepcalm.coi.client.effects.EffectManager;
+import dev.ua.ikeepcalm.coi.client.mcf.MythicalFormManager;
 import dev.ua.ikeepcalm.coi.client.hud.AbilityHudOverlay;
 import dev.ua.ikeepcalm.coi.client.network.*;
 import dev.ua.ikeepcalm.coi.client.screen.AbilityBindingScreen;
@@ -66,6 +67,7 @@ public class CircleOfImaginationClient implements ClientModInitializer {
         PayloadTypeRegistry.clientboundPlay().register(AbilitiesPayload.ID, AbilitiesPayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(CooldownPayload.ID, CooldownPayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(VisualEffectPayload.ID, VisualEffectPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(MythicalFormPayload.ID, MythicalFormPayload.CODEC);
 
         // S2C receivers
         ClientPlayNetworking.registerGlobalReceiver(AbilitiesPayload.ID,
@@ -74,6 +76,8 @@ public class CircleOfImaginationClient implements ClientModInitializer {
                 (payload, context) -> context.client().execute(() -> handleCooldownData(payload.abilityId(), payload.ticks())));
         ClientPlayNetworking.registerGlobalReceiver(VisualEffectPayload.ID,
                 (payload, context) -> context.client().execute(() -> EffectManager.trigger(payload.effectId(), payload.params())));
+        ClientPlayNetworking.registerGlobalReceiver(MythicalFormPayload.ID,
+                (payload, context) -> context.client().execute(() -> MythicalFormManager.handlePacket(payload.targetUuid(), payload.params())));
     }
 
     private void registerKeybindings() {
