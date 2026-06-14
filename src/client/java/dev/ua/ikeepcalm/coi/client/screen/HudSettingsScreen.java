@@ -23,6 +23,7 @@ public class HudSettingsScreen extends Screen {
     private Checkbox showAbilityNamesCheckbox;
     private Checkbox showGlowEffectCheckbox;
     private Checkbox epilepsyModeCheckbox;
+    private Checkbox showMadnessBarCheckbox;
 
     private EditBox hudXField;
     private EditBox hudYOffsetField;
@@ -30,11 +31,14 @@ public class HudSettingsScreen extends Screen {
     private EditBox slotSpacingField;
     private EditBox hudScaleField;
     private EditBox wheelSlotsField;
+    private EditBox madnessYOffsetField;
 
     private Button resetButton;
     private Button presetButton;
+    private Button madnessAnchorButton;
     private int currentPreset = 0;
     private static final String[] PRESETS = {"Default", "Compact", "Large", "Minimal"};
+    private static final String[] ANCHORS = {"TOP_LEFT", "TOP_CENTER", "BOTTOM_LEFT", "BOTTOM_CENTER"};
 
     public HudSettingsScreen(Screen parent) {
         super(Component.translatable("screen.coi.hud_settings"));
@@ -55,6 +59,8 @@ public class HudSettingsScreen extends Screen {
         to.hudScale = from.hudScale;
         to.wheelSlots = from.wheelSlots;
         to.epilepsyMode = from.epilepsyMode;
+        to.showMadnessBar = from.showMadnessBar;
+        to.madnessYOffset = from.madnessYOffset;
     }
 
     @Override
@@ -256,12 +262,56 @@ public class HudSettingsScreen extends Screen {
         this.addRenderableWidget(wheelSlotsField);
         currentY += spacing;
 
+        AbstractSliderButton madnessYOffsetSlider = new AbstractSliderButton(leftColumn, currentY, sliderWidth, 20, Component.literal("Madness Y Offset: " + settings.madnessYOffset), settings.madnessYOffset / 200.0) {
+            @Override
+            protected void updateMessage() {
+                settings.madnessYOffset = (int) (this.value * 200);
+                this.setMessage(Component.literal("Madness Y Offset: " + settings.madnessYOffset));
+                madnessYOffsetField.setValue(String.valueOf(settings.madnessYOffset));
+            }
+
+            @Override
+            protected void applyValue() {
+                settings.madnessYOffset = (int) (this.value * 200);
+                this.setMessage(Component.literal("Madness Y Offset: " + settings.madnessYOffset));
+                madnessYOffsetField.setValue(String.valueOf(settings.madnessYOffset));
+            }
+        };
+        this.addRenderableWidget(madnessYOffsetSlider);
+
+        madnessYOffsetField = new EditBox(this.font, rightColumn, currentY, fieldWidth, 20, Component.translatable("screen.coi.madness_y_offset_field"));
+        madnessYOffsetField.setValue(String.valueOf(settings.madnessYOffset));
+        madnessYOffsetField.setResponder(text -> {
+            try {
+                int value = Integer.parseInt(text);
+                settings.madnessYOffset = Math.clamp(value, 0, 200);
+            } catch (NumberFormatException ignored) {
+            }
+        });
+        this.addRenderableWidget(madnessYOffsetField);
+        currentY += spacing;
+
         showKeybindsCheckbox = Checkbox.builder(Component.translatable("screen.coi.show_keybinds"), Minecraft.getInstance().font)
                 .pos(leftColumn, currentY)
                 .maxWidth(200).onValueChange((checkbox, checked) -> settings.showKeybinds = checked).selected(settings.showKeybinds)
                 .build();
 
         this.addRenderableWidget(showKeybindsCheckbox);
+
+        madnessAnchorButton = Button.builder(Component.literal("Madness Anchor: " + settings.madnessAnchor),
+                button -> {
+                    int idx = 0;
+                    for (int i = 0; i < ANCHORS.length; i++) {
+                        if (ANCHORS[i].equalsIgnoreCase(settings.madnessAnchor)) {
+                            idx = i;
+                            break;
+                        }
+                    }
+                    int nextIdx = (idx + 1) % ANCHORS.length;
+                    settings.madnessAnchor = ANCHORS[nextIdx];
+                    button.setMessage(Component.literal("Madness Anchor: " + settings.madnessAnchor));
+                }).bounds(rightColumn, currentY, 130, 20).build();
+        this.addRenderableWidget(madnessAnchorButton);
         currentY += 25;
 
         showAbilityNamesCheckbox = Checkbox.builder(Component.translatable("screen.coi.show_ability_names"), Minecraft.getInstance().font)
@@ -286,6 +336,14 @@ public class HudSettingsScreen extends Screen {
                 .build();
 
         this.addRenderableWidget(epilepsyModeCheckbox);
+        currentY += 25;
+
+        showMadnessBarCheckbox = Checkbox.builder(Component.translatable("screen.coi.show_madness_bar"), Minecraft.getInstance().font)
+                .pos(leftColumn, currentY)
+                .maxWidth(200).onValueChange((checkbox, checked) -> settings.showMadnessBar = checked).selected(settings.showMadnessBar)
+                .build();
+
+        this.addRenderableWidget(showMadnessBarCheckbox);
 
         int buttonY = this.height - Math.max(40, this.height / 10);
         int buttonWidth = Math.min(100, this.width / 8);
@@ -326,6 +384,9 @@ public class HudSettingsScreen extends Screen {
                 settings.showKeybinds = true;
                 settings.showAbilityNames = true;
                 settings.showGlowEffect = true;
+                settings.showMadnessBar = true;
+                settings.madnessYOffset = 55;
+                settings.madnessAnchor = "TOP_LEFT";
                 break;
             case 1: // Compact - Small and minimal
                 settings.hudX = 5;
@@ -336,6 +397,9 @@ public class HudSettingsScreen extends Screen {
                 settings.showKeybinds = true;
                 settings.showAbilityNames = false;
                 settings.showGlowEffect = false;
+                settings.showMadnessBar = true;
+                settings.madnessYOffset = 35;
+                settings.madnessAnchor = "TOP_LEFT";
                 break;
             case 2: // Large - Bigger but still safe
                 settings.hudX = 15;
@@ -346,6 +410,9 @@ public class HudSettingsScreen extends Screen {
                 settings.showKeybinds = true;
                 settings.showAbilityNames = true;
                 settings.showGlowEffect = true;
+                settings.showMadnessBar = true;
+                settings.madnessYOffset = 70;
+                settings.madnessAnchor = "TOP_LEFT";
                 break;
             case 3: // Minimal - Very small and clean
                 settings.hudX = 3;
@@ -356,6 +423,9 @@ public class HudSettingsScreen extends Screen {
                 settings.showKeybinds = false;
                 settings.showAbilityNames = false;
                 settings.showGlowEffect = false;
+                settings.showMadnessBar = false;
+                settings.madnessYOffset = 25;
+                settings.madnessAnchor = "TOP_LEFT";
                 break;
         }
         refreshWidgets();
@@ -374,6 +444,10 @@ public class HudSettingsScreen extends Screen {
         slotSpacingField.setValue(String.valueOf(settings.slotSpacing));
         hudScaleField.setValue(String.format("%.1f", settings.hudScale));
         wheelSlotsField.setValue(String.valueOf(settings.wheelSlots));
+        madnessYOffsetField.setValue(String.valueOf(settings.madnessYOffset));
+        if (madnessAnchorButton != null) {
+            madnessAnchorButton.setMessage(Component.literal("Madness Anchor: " + settings.madnessAnchor));
+        }
 
         presetButton.setMessage(Component.translatable("screen.coi.preset").append(": " + PRESETS[currentPreset]));
     }
@@ -384,6 +458,7 @@ public class HudSettingsScreen extends Screen {
         settings.showAbilityNames = showAbilityNamesCheckbox.selected();
         settings.showGlowEffect = showGlowEffectCheckbox.selected();
         settings.epilepsyMode = epilepsyModeCheckbox.selected();
+        settings.showMadnessBar = showMadnessBarCheckbox.selected();
 
         HudConfig.setSettings(settings);
     }
@@ -419,6 +494,10 @@ public class HudSettingsScreen extends Screen {
         labelY += spacing;
 
         graphics.text(this.font, Component.translatable("screen.coi.wheel_slots"),
+                leftColumn, labelY - 15, 0xFFA0A0A0);
+        labelY += spacing;
+
+        graphics.text(this.font, Component.translatable("screen.coi.madness_y_offset"),
                 leftColumn, labelY - 15, 0xFFA0A0A0);
 
         if (!settings.enabled) {

@@ -57,5 +57,8 @@
   "screen.coi.key_bindings": "Прив'язки Клавіш",
   "screen.coi.wheel_slot": "Слот Колеса",
   "screen.coi.empty_slot": "Порожньо",
-  "screen.coi.select_ability": "Оберіть Здібність"
+  "screen.coi.select_ability": "Оберіть Здібність",
+  "screen.coi.show_madness_bar": "Показувати Шкалу Божевілля",
+  "screen.coi.madness_y_offset": "Вертикальна Позиція Божевілля",
+  "screen.coi.madness_y_offset_field": "Зсув Божевілля Y"
 }

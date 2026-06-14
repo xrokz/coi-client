@@ -7,6 +7,7 @@ import dev.ua.ikeepcalm.coi.client.config.HudConfig;
 import dev.ua.ikeepcalm.coi.client.effects.EffectManager;
 import dev.ua.ikeepcalm.coi.client.mcf.MythicalFormManager;
 import dev.ua.ikeepcalm.coi.client.hud.AbilityHudOverlay;
+import dev.ua.ikeepcalm.coi.client.hud.MadnessHudOverlay;
 import dev.ua.ikeepcalm.coi.client.network.*;
 import dev.ua.ikeepcalm.coi.client.screen.AbilityBindingScreen;
 import dev.ua.ikeepcalm.coi.client.screen.AbilityWheelScreen;
@@ -14,6 +15,7 @@ import dev.ua.ikeepcalm.coi.client.screen.EffectDebugScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.loader.api.FabricLoader;
@@ -56,7 +58,15 @@ public class CircleOfImaginationClient implements ClientModInitializer {
         registerKeybindings();
         registerTickHandler();
         AbilityHudOverlay.initialize();
+        MadnessHudOverlay.initialize();
         EffectManager.initialize();
+
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            requestAbilitiesFromServer();
+        });
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            ClientBeyonderState.reset();
+        });
     }
 
     private void registerPayloads() {
@@ -68,6 +78,7 @@ public class CircleOfImaginationClient implements ClientModInitializer {
         PayloadTypeRegistry.clientboundPlay().register(CooldownPayload.ID, CooldownPayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(VisualEffectPayload.ID, VisualEffectPayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(MythicalFormPayload.ID, MythicalFormPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(ConditionsPayload.ID, ConditionsPayload.CODEC);
 
         // S2C receivers
         ClientPlayNetworking.registerGlobalReceiver(AbilitiesPayload.ID,
@@ -78,6 +89,8 @@ public class CircleOfImaginationClient implements ClientModInitializer {
                 (payload, context) -> context.client().execute(() -> EffectManager.trigger(payload.effectId(), payload.params())));
         ClientPlayNetworking.registerGlobalReceiver(MythicalFormPayload.ID,
                 (payload, context) -> context.client().execute(() -> MythicalFormManager.handlePacket(payload.targetUuid(), payload.params())));
+        ClientPlayNetworking.registerGlobalReceiver(ConditionsPayload.ID,
+                (payload, context) -> context.client().execute(() -> ClientBeyonderState.parseAndUpdate(payload.data())));
     }
 
     private void registerKeybindings() {

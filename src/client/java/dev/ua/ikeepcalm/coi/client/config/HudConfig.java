@@ -30,6 +30,9 @@ public class HudConfig {
         public float hudScale = 1.0f;
         public int wheelSlots = 8;
         public boolean epilepsyMode = false;
+        public boolean showMadnessBar = true;
+        public int madnessYOffset = 55;
+        public String madnessAnchor = "TOP_LEFT";
     }
 
     public static void load() {
@@ -49,6 +52,9 @@ public class HudConfig {
                 settings.hudScale = json.has("hudScale") ? json.get("hudScale").getAsFloat() : 1.0f;
                 settings.wheelSlots = json.has("wheelSlots") ? json.get("wheelSlots").getAsInt() : 8;
                 settings.epilepsyMode = json.has("epilepsyMode") && json.get("epilepsyMode").getAsBoolean();
+                settings.showMadnessBar = !json.has("showMadnessBar") || json.get("showMadnessBar").getAsBoolean();
+                settings.madnessYOffset = json.has("madnessYOffset") ? json.get("madnessYOffset").getAsInt() : 55;
+                settings.madnessAnchor = json.has("madnessAnchor") ? json.get("madnessAnchor").getAsString() : "TOP_LEFT";
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -70,6 +76,9 @@ public class HudConfig {
         json.addProperty("hudScale", settings.hudScale);
         json.addProperty("wheelSlots", settings.wheelSlots);
         json.addProperty("epilepsyMode", settings.epilepsyMode);
+        json.addProperty("showMadnessBar", settings.showMadnessBar);
+        json.addProperty("madnessYOffset", settings.madnessYOffset);
+        json.addProperty("madnessAnchor", settings.madnessAnchor);
 
         try {
             Files.writeString(CONFIG_PATH, GSON.toJson(json));

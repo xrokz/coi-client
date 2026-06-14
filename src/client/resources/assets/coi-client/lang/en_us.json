@@ -58,5 +58,8 @@
   "screen.coi.key_bindings": "Key Bindings",
   "screen.coi.wheel_slot": "Wheel Slot",
   "screen.coi.empty_slot": "Empty",
-  "screen.coi.select_ability": "Select an Ability"
+  "screen.coi.select_ability": "Select an Ability",
+  "screen.coi.show_madness_bar": "Show Madness Bar",
+  "screen.coi.madness_y_offset": "Madness Vertical Position",
+  "screen.coi.madness_y_offset_field": "Madness Y"
 }
